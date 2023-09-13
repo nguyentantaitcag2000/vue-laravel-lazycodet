@@ -1,0 +1,45 @@
+version: '2'
+services:
+  webserver: 
+    build: .
+    # image: nguyentantaitcag2000/interior-shop:v1.0
+    ports:
+      - '8000:80' 
+      - '5173:5173' 
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html 
+      - ./docker-apache.conf:/etc/apache2/sites-available/000-default.conf 
+    links:
+      - db 
+    networks:
+      - laravel
+  db: 
+    image: mysql:5.7 
+    volumes: 
+      - "./data/db:/var/lib/mysql"
+    restart: always
+    environment: 
+      MYSQL_ROOT_PASSWORD: root 
+      MYSQL_DATABASE: supercode 
+      # MYSQL_USER: root 
+      MYSQL_PASSWORD: root  
+    ports:
+      - "3306:3306" 
+    networks:
+      - laravel
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - '8080:80'
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      - db
+    networks:
+    - laravel
+networks:
+  laravel:
+    driver: bridge
